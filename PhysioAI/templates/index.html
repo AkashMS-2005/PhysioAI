@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PhysioAI — Rehabilitation Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">🏥</div>
+    <div class="logo-txt">Physio<span>AI</span></div>
+  </div>
+  <div class="hdr-r">
+    <div class="voice-ind" id="vInd">
+      <div class="vbars"><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
+      <span id="vLbl">VOICE READY</span>
+    </div>
+    <div class="badge"><div class="dot"></div>AI SYSTEM ONLINE</div>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- LEFT -->
+  <div class="left-col">
+    <div class="card">
+      <div class="ch"><span class="ct">Patient Setup</span><span class="cb">REQUIRED</span></div>
+      <div class="fl">Patient Name</div>
+      <input type="text" id="patName" placeholder="Enter patient name…"/>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Exercise Selection</span><span class="cb" id="exBadge">NONE</span></div>
+      <div class="ex-grid" id="exGrid"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span class="ct">Target Repetitions</span></div>
+      <div class="rep-row"><div class="rep-n" id="repN">10</div><div class="rep-l">REPS</div></div>
+      <input type="range" id="repSlider" min="5" max="30" value="10"
+             oninput="document.getElementById('repN').textContent=this.value"/>
+    </div>
+    <button class="btn" id="mainBtn" onclick="toggleWorkout()">&#9654; START SESSION</button>
+    <div class="card">
+      <div class="ch"><span class="ct">Session Info</span></div>
+      <div class="info-row">
+        <div><div class="fl">Duration</div><div class="info-val" id="durDisp">00:00</div></div>
+        <div><div class="fl">Calories</div><div class="info-val orange" id="calDisp">0.0</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center-col">
+    <div class="cam-wrap" id="camWrap">
+      <img id="camStream" src="" alt=""
+           style="position:absolute;width:100%;height:100%;object-fit:cover;display:none;border-radius:var(--r)"/>
+      <canvas id="demoCanvas" style="position:absolute;width:100%;height:100%"></canvas>
+      <div class="hud" id="hud">
+        <div class="hc" id="hudEx">—</div>
+        <div class="hc green" id="hudStage">READY</div>
+        <div class="hc orange" id="hudConf" style="display:none">AI 0%</div>
+      </div>
+      <div class="conf-wrap" id="confWrap">
+        <div class="conf-track"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+        <div class="conf-lbl" id="confLbl">MODEL CONFIDENCE: 0%</div>
+      </div>
+      <div id="camBadge" style="display:none;position:absolute;bottom:40px;right:12px;z-index:4;
+           background:rgba(6,10,16,.85);border:1px solid rgba(16,217,124,.3);border-radius:8px;
+           padding:4px 10px;font-family:'DM Mono',monospace;font-size:.62rem;color:#10d97c">
+        &#128247; LIVE CAM
+      </div>
+      <div class="cam-ph" id="camPh">
+        <div class="cam-ring">&#128249;</div>
+        <h3>AI Vision Ready</h3>
+        <p>Enter patient details, select an exercise, and press <strong>Start Session</strong>.</p>
+      </div>
+    </div>
+
+    <div class="rep-strip">
+      <div class="mb"><div class="mv" id="repDisp">0</div><div class="mu">Reps Done</div></div>
+      <div class="md"></div>
+      <div class="mb"><div class="mv dim" id="tgtDisp">10</div><div class="mu">Target</div></div>
+      <div class="md"></div>
+      <div class="mb"><div class="mv green" id="remDisp">10</div><div class="mu">Remaining</div></div>
+    </div>
+
+    <div class="card">
+      <div class="ph"><span class="pl">Session Progress</span><span class="pp" id="progPct">0%</span></div>
+      <div class="pt"><div class="pf" id="progFill" style="width:0%"></div></div>
+      <div class="fb" id="fbBand">Waiting to start your session…</div>
+      <div class="gauge-row">
+        <svg width="116" height="68" viewBox="0 0 116 68">
+          <path d="M8,63 A50,50 0 0,1 108,63" fill="none" stroke="rgba(56,120,200,.15)" stroke-width="6" stroke-linecap="round"/>
+          <path id="arcFill" d="M8,63 A50,50 0 0,1 108,63" fill="none" stroke="url(#ag)"
+                stroke-width="6" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157"
+                style="transition:stroke-dashoffset .25s ease"/>
+          <defs><linearGradient id="ag" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#10d97c"/>
+          </linearGradient></defs>
+          <text id="arcTxt" x="58" y="58" text-anchor="middle" fill="#60a5fa"
+                font-family="'DM Mono',monospace" font-size="15" font-weight="500">&#8212;&#176;</text>
+        </svg>
+        <div>
+          <div class="at">Joint Angle</div>
+          <div class="av" id="angleV">&#8212;&#176;</div>
+          <div class="sp" id="stageP">READY</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+    <div class="card">
+      <div class="ch"><span class="ct">Live Metrics</span><div class="dot" id="liveDot" style="opacity:.3"></div></div>
+      <div class="tiles">
+        <div class="tile"><div class="ti">&#128257;</div><div class="tv" id="totReps">0</div><div class="tl">Total Reps</div></div>
+        <div class="tile"><div class="ti">&#128293;</div><div class="tv" id="totCal">0</div><div class="tl">Calories</div></div>
+        <div class="tile"><div class="ti">&#128203;</div><div class="tv" id="totSess">0</div><div class="tl">Sessions</div></div>
+        <div class="tile"><div class="ti">&#9889;</div><div class="tv">96%</div><div class="tl">AI Accuracy</div></div>
+      </div>
+    </div>
+
+    <div class="card history-card">
+      <div class="ch"><span class="ct">Session History</span><span class="cb" id="histCnt">0</span></div>
+      <div class="hs" id="histList">
+        <div class="empty">No sessions yet.<br/>Complete a workout to see history.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch"><span class="ct">AI Model</span>
+        <span class="cb" style="color:var(--gn);border-color:rgba(16,217,124,.3)">ACTIVE</span>
+      </div>
+      <div class="ai-rows">
+        <div class="ai-row"><span class="ai-k">Pose Engine</span><span class="ai-v" id="poseEngine">Checking…</span></div>
+        <div class="ai-row"><span class="ai-k">Classifier</span><span class="ai-v">Random Forest</span></div>
+        <div class="ai-row"><span class="ai-k">Landmarks</span><span class="ai-v">33 body points</span></div>
+        <div class="ai-row"><span class="ai-k">Processing</span><span class="ai-v live">~30 FPS</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- Completion modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="m-em">&#127942;</div>
+    <div class="m-ti">Set Complete!</div>
+    <div class="m-su" id="mSub">Outstanding performance today</div>
+    <div class="m-stats">
+      <div class="ms"><div class="msv" id="mReps">&#8212;</div><div class="msl">Reps</div></div>
+      <div class="ms"><div class="msv" id="mTime">&#8212;</div><div class="msl">Time</div></div>
+      <div class="ms"><div class="msv" id="mCal">&#8212;</div><div class="msl">Kcal</div></div>
+    </div>
+    <button class="btn-cl" onclick="closeModal()">CONTINUE &#8594;</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
