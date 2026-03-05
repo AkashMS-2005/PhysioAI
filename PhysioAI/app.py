@@ -2,13 +2,18 @@
 # Run: python app.py  →  open http://localhost:5000
 
 import sys, os, time, math, random, threading, webbrowser
+import importlib.util
 
 # Dependency check
 def _check():
-    missing = [p for p, m in [("flask","flask"),("scikit-learn","sklearn"),("numpy","numpy")] if not __import__("importlib").util.find_spec(m)]
+    missing = [
+        p for p, m in [("flask","flask"),("scikit-learn","sklearn"),("numpy","numpy")]
+        if importlib.util.find_spec(m) is None
+    ]
     if missing:
-        print(f"\n❌  Missing: {', '.join(missing)}\n    Run: pip install {' '.join(missing)}\n")
+        print(f"\n❌ Missing: {', '.join(missing)}\n Run: pip install {' '.join(missing)}\n")
         sys.exit(1)
+
 _check()
 
 import numpy as np
