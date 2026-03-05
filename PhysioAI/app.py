@@ -206,12 +206,17 @@ if __name__ == "__main__":
     print("╔══════════════════════════════════════════════════════════╗")
     print("║           PhysioAI — Rehabilitation Assistant            ║")
     print("╠══════════════════════════════════════════════════════════╣")
+
     get_clf()
-    print(f"║  {'✓ OpenCV webcam ready' if CV2_OK else '⚠  pip install opencv-python':<54}║")
-    print(f"║  {'✓ MediaPipe pose ready' if MP_OK  else '⚠  pip install mediapipe':<54}║")
-    print("║  ✓ Flask server starting on http://localhost:5000        ║")
+
+    print(f"║  {'✓ OpenCV webcam ready' if CV2_OK else '⚠ pip install opencv-python':<54}║")
+    print(f"║  {'✓ MediaPipe pose ready' if MP_OK else '⚠ pip install mediapipe':<54}║")
+
+    print("║  ✓ Flask server starting...                              ║")
     print("╚══════════════════════════════════════════════════════════╝")
     print()
-    threading.Thread(target=lambda: (time.sleep(1.2), webbrowser.open("http://localhost:5000")), daemon=True).start()
-    port = int(os.environ.get("PORT", 5000))
+
+    # Use dynamic port for cloud deployment
+    port = int(os.environ.get("PORT", 10000))
+
     app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
